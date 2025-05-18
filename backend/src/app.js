@@ -11,6 +11,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+// Connect to MongoDB Atlas
 connectDB();
 
 // Routes
