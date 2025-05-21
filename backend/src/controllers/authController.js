@@ -63,3 +63,15 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
+exports.getMe = async (req, res) => {
+  try {
+    res.status(200).json({
+      message: 'User details retrieved',
+      user: { id: req.user._id, name: req.user.name, email: req.user.email, role: req.user.role }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
