@@ -8,5 +8,6 @@ router.get('/', authMiddleware.protect, flashcardController.getFlashcards);
 router.get('/:id', authMiddleware.protect, flashcardController.getFlashcard);
 router.put('/:id', authMiddleware.protect, flashcardController.updateFlashcard);
 router.delete('/:id', authMiddleware.protect, flashcardController.deleteFlashcard);
+router.post('/bulk-delete', authMiddleware.protect, flashcardController.bulkDeleteFlashcards);
 
 module.exports = router;
