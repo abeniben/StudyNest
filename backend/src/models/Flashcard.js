@@ -43,4 +43,7 @@ const flashcardSchema = new mongoose.Schema({
   timestamps: true
 });
 
+
+flashcardSchema.index({ question: 'text', answer: 'text', tags: 'text' });
+
 module.exports = mongoose.model('Flashcard', flashcardSchema);
