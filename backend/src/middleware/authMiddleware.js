@@ -1,5 +1,6 @@
 
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 exports.protect = async (req, res, next) => {
   try {
@@ -9,17 +10,27 @@ exports.protect = async (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({ message: 'Not authorized, no token' });
+      return res.status(401).json({ message: 'Not authorized, no token provided' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await require('../models/User').findById(decoded.userId).select('-password');
-    if (!req.user) {
+    const user = await User.findById(decoded.id).select('+password');
+
+    if (!user) {
       return res.status(401).json({ message: 'Not authorized, user not found' });
     }
 
+    // Check token version for auto-logout
+    if (decoded.tokenVersion !== user.tokenVersion) {
+      return res.status(401).json({ message: 'Not authorized, token invalid' });
+    }
+
+    req.user = user;
     next();
   } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Not authorized, token expired' });
+    }
     res.status(401).json({ message: 'Not authorized, token invalid' });
   }
 };
