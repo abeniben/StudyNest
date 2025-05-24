@@ -164,26 +164,3 @@ exports.deleteNote = async (req, res) => {
   }
 };
 
-
-exports.bulkDeleteNotes = async (req, res) => {
-  try {
-    const { ids } = req.body;
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ message: 'IDs must be a non-empty array' });
-    }
-
-    const result = await Note.deleteMany({ _id: { $in: ids }, userId: req.user._id });
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: 'No notes found or not authorized' });
-    }
-
-    res.status(200).json({
-      message: `Deleted ${result.deletedCount} note(s) successfully`
-    });
-  } catch (error) {
-    if (error.name === 'CastError') {
-      return res.status(400).json({ message: 'Invalid note IDs' });
-    }
-    res.status(500).json({ message: 'Failed to delete notes', error: error.message });
-  }
-};
