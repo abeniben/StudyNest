@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -14,21 +13,25 @@ exports.protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('+password');
+    console.log('Decoded JWT:', decoded); // Debug log
+
+    const user = await User.findById(decoded.userId);
+    console.log('User query result:', user); // Debug log
 
     if (!user) {
-      console.log("Decoded id: ", decoded)
       return res.status(401).json({ message: 'Not authorized, user not found' });
     }
 
-    // Check token version for auto-logout
-    if (decoded.tokenVersion !== user.tokenVersion) {
+    // Check token version for auto-logout, default to 0 if undefined
+    const tokenVersion = decoded.tokenVersion ?? 0;
+    if (tokenVersion !== user.tokenVersion) {
       return res.status(401).json({ message: 'Not authorized, token invalid' });
     }
 
     req.user = user;
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error); // Debug log
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Not authorized, token expired' });
     }

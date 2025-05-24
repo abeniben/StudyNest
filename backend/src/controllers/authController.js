@@ -6,19 +6,25 @@ exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already in use' });
+    }
+
+  
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message: 'Password must be at least 8 characters, including uppercase, lowercase, number, and special character'
+      });
     }
 
     // Create new user (password hashing handled by User model pre-save hook)
     const user = new User({ name, email, password });
     await user.save();
 
-
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role, tokenVersion: user.tokenVersion },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -33,23 +39,22 @@ exports.signup = async (req, res) => {
   }
 };
 
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role, tokenVersion: user.tokenVersion },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -64,7 +69,6 @@ exports.login = async (req, res) => {
   }
 };
 
-
 exports.getMe = async (req, res) => {
   try {
     res.status(200).json({
@@ -75,7 +79,6 @@ exports.getMe = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -94,6 +97,7 @@ exports.updateProfile = async (req, res) => {
       user.name = name.trim();
     }
 
+  
     if (email && email !== user.email) {
       const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
       if (!emailRegex.test(email)) {
@@ -106,7 +110,7 @@ exports.updateProfile = async (req, res) => {
       user.email = email.toLowerCase().trim();
     }
 
-
+  
     if (newPassword) {
       if (!currentPassword) {
         return res.status(400).json({ message: 'Current password is required to update password' });
@@ -127,7 +131,7 @@ exports.updateProfile = async (req, res) => {
       user.tokenVersion += 1; // Invalidate existing tokens
     }
 
-    // Save only if changes were made
+    
     if (name || (email && email !== user.email) || newPassword) {
       await user.save();
     }
