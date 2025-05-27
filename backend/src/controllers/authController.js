@@ -89,15 +89,17 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    
+    let isModified = false;
+
     if (name) {
       if (name.length < 2 || name.length > 50) {
         return res.status(400).json({ message: 'Name must be 2-50 characters' });
       }
       user.name = name.trim();
+      isModified = true;
     }
 
-  
+    
     if (email && email !== user.email) {
       const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
       if (!emailRegex.test(email)) {
@@ -108,9 +110,10 @@ exports.updateProfile = async (req, res) => {
         return res.status(400).json({ message: 'Email already registered' });
       }
       user.email = email.toLowerCase().trim();
+      isModified = true;
     }
 
-  
+    
     if (newPassword) {
       if (!currentPassword) {
         return res.status(400).json({ message: 'Current password is required to update password' });
@@ -129,11 +132,13 @@ exports.updateProfile = async (req, res) => {
 
       user.password = newPassword;
       user.tokenVersion += 1; // Invalidate existing tokens
+      isModified = true;
     }
 
-    
-    if (name || (email && email !== user.email) || newPassword) {
+    // Save if modified
+    if (isModified) {
       await user.save();
+      console.log('User saved:', user);
     }
 
     res.status(200).json({
