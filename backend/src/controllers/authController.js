@@ -158,3 +158,20 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }
 };
+
+
+exports.logout = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.tokenVersion += 1;
+    await user.save();
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to logout', error: error.message });
+  }
+};
