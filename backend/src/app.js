@@ -6,6 +6,7 @@ const routes = require('./routes');
 
 // Load environment variables
 dotenv.config();
+console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY);
 
 const app = express();
 
