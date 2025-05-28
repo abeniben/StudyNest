@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -21,7 +22,6 @@ try {
   console.error('Error reading .env:', err.message);
 }
 
-dotenv.config({ path: envPath });
 console.log('Environment variables:', {
   MONGO_URI: process.env.MONGO_URI ? 'Found' : 'Missing',
   JWT_SECRET: process.env.JWT_SECRET ? 'Found' : 'Missing',
