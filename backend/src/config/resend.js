@@ -1,9 +1,9 @@
 const { Resend } = require('resend');
 
-
 if (!process.env.RESEND_API_KEY) {
-    console.log("No resend key here")
-  throw new Error('RESEND_API_KEY is not set in .env');
+  console.warn('RESEND_API_KEY not set in .env; email functionality disabled');
+  module.exports = { resend: null, getPasswordResetEmail: () => null };
+  return;
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
