@@ -208,9 +208,9 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Send reset email
-    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetUrl = `http://localhost:5000/api/auth/reset-password/${resetToken}`;
     await resend.emails.send({
-      from: 'StudyNest <no-reply@studynest.app>',
+      from: 'StudyNest <onboarding@resend.dev>',
       to: user.email,
       subject: 'Reset Your StudyNest Password',
       html: getPasswordResetEmail(user.name, resetUrl)
