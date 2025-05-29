@@ -138,7 +138,7 @@ exports.updateProfile = async (req, res) => {
       isModified = true;
     }
 
-    // Save if modified
+
     if (isModified) {
       await user.save();
       console.log('User saved:', user);
@@ -200,14 +200,13 @@ exports.forgotPassword = async (req, res) => {
       return res.status(200).json({ success: true, message: 'Reset link sent to email' }); // Prevent email enumeration
     }
 
-    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetPasswordHash = await bcrypt.hash(resetToken, 10);
     user.resetPasswordHash = resetPasswordHash;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // Send reset email
+
     const resetUrl = `http://localhost:5000/api/auth/reset-password/${resetToken}`;
     await resend.emails.send({
       from: 'StudyNest <onboarding@resend.dev>',
