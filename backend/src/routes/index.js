@@ -8,6 +8,7 @@ const sessionRouter = require('./sessions');
 const searchRouter = require('./search');
 const taskRouter = require('./tasks');
 const notificationRouter = require('./notifications');
+const dashboardRouter = require('./dashboard');
 
 
 router.get('/', (req, res) => { 
@@ -22,6 +23,7 @@ router.use('/sessions', sessionRouter);
 router.use('/search', searchRouter);
 router.use('/tasks', taskRouter);
 router.use('/notifications', notificationRouter);
+router.use('/dashboard', dashboardRouter);
 
 
 module.exports = router;
