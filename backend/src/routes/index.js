@@ -6,6 +6,9 @@ const noteRouter = require('./notes');
 const flashcardRouter = require('./flashcards');
 const sessionRouter = require('./sessions');
 const searchRouter = require('./search');
+const taskRouter = require('./tasks');
+const notificationRouter = require('./notifications');
+
 
 router.get('/', (req, res) => { 
     res.json({ message: 'Welcome to StudyNest API' }); 
@@ -17,5 +20,8 @@ router.use('/notes', noteRouter);
 router.use('/flashcards', flashcardRouter);
 router.use('/sessions', sessionRouter);
 router.use('/search', searchRouter);
+router.use('/tasks', taskRouter);
+router.use('/notifications', notificationRouter);
+
 
 module.exports = router;
