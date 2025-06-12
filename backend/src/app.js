@@ -46,8 +46,22 @@ console.log('Environment variables:', {
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middlewares
+
+const allowedOrigins = [
+  "http://localhost:3000", // Local
+  "https://studynest.vercel.app", // Deployed
+];
+app.use(cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
+  })
+);
 app.use(express.json());
 
 // Connect to MongoDB Atlas
